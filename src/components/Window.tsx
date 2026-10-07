@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { insetsFor, SAFARI_TOOLBAR_HEIGHT } from "@/lib/constants/layout";
 import type { Theme } from "@/lib/theme";
 
@@ -41,6 +41,21 @@ type WindowProps = {
 
 // How much of a window must stay on screen when dragged toward an edge.
 const KEEP_VISIBLE = 80;
+
+/** Which edges a resize grip moves; a corner moves two. */
+type Edges = { n?: boolean; s?: boolean; e?: boolean; w?: boolean };
+
+// Grips straddle the window outline (outside the rounded-corner clip), like real OS windows.
+const RESIZE_GRIPS: { edges: Edges; className: string }[] = [
+  { edges: { n: true }, className: "inset-x-3 -top-1 h-2 cursor-ns-resize" },
+  { edges: { s: true }, className: "inset-x-3 -bottom-1 h-2 cursor-ns-resize" },
+  { edges: { w: true }, className: "inset-y-3 -left-1 w-2 cursor-ew-resize" },
+  { edges: { e: true }, className: "inset-y-3 -right-1 w-2 cursor-ew-resize" },
+  { edges: { n: true, w: true }, className: "-top-1 -left-1 size-4 cursor-nwse-resize" },
+  { edges: { n: true, e: true }, className: "-top-1 -right-1 size-4 cursor-nesw-resize" },
+  { edges: { s: true, w: true }, className: "-bottom-1 -left-1 size-4 cursor-nesw-resize" },
+  { edges: { s: true, e: true }, className: "-right-1 -bottom-1 size-4 cursor-nwse-resize" },
+];
 
 // Windows 11 caption-button glyphs (thin, 10px).
 function CaptionGlyph({ kind }: { kind: "min" | "max" | "restore" | "close" }) {
@@ -118,17 +133,27 @@ export function Window({
   onFrameChange,
   children,
 }: WindowProps) {
-  // Pointer position and frame at the moment a drag/resize started.
-  const gesture = useRef<{ kind: "move" | "resize"; px: number; py: number; start: WindowFrame } | null>(null);
+  // Pointer position and frame at the moment a drag/resize started, plus the latest frame (read
+  // on release, since a fast drag can end before React renders the last move).
+  const gesture = useRef<{
+    kind: "move" | Edges;
+    px: number;
+    py: number;
+    start: WindowFrame;
+    latest: WindowFrame | null;
+  } | null>(null);
+  // While dragging or resizing, the frame lives here so only this window re-renders per pointer
+  // move; the desktop gets the final frame when the gesture ends.
+  const [liveFrame, setLiveFrame] = useState<WindowFrame | null>(null);
+  const shown = liveFrame ?? frame;
   const fullscreen = maximized || isMobile;
   const inset = insetsFor(theme, isMobile);
 
-  const beginGesture = (kind: "move" | "resize") => (e: React.PointerEvent) => {
-    onFocus();
+  const beginGesture = (kind: "move" | Edges) => (e: React.PointerEvent) => {
     if (fullscreen || e.button !== 0) return;
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
-    gesture.current = { kind, px: e.clientX, py: e.clientY, start: frame };
+    gesture.current = { kind, px: e.clientX, py: e.clientY, start: frame, latest: null };
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
@@ -136,25 +161,38 @@ export function Window({
     if (!g) return;
     const dx = e.clientX - g.px;
     const dy = e.clientY - g.py;
-    if (g.kind === "move") {
+    const { kind, start } = g;
+    let next: WindowFrame;
+    if (kind === "move") {
       const maxX = window.innerWidth - KEEP_VISIBLE;
       const maxY = window.innerHeight - inset.bottom - 30;
-      onFrameChange({
-        ...g.start,
-        x: Math.min(Math.max(g.start.x + dx, KEEP_VISIBLE - g.start.w), maxX),
-        y: Math.min(Math.max(g.start.y + dy, inset.top), maxY),
-      });
+      next = {
+        ...start,
+        x: Math.min(Math.max(start.x + dx, KEEP_VISIBLE - start.w), maxX),
+        y: Math.min(Math.max(start.y + dy, inset.top), maxY),
+      };
     } else {
-      onFrameChange({
-        ...g.start,
-        w: Math.max(g.start.w + dx, minSize.w),
-        h: Math.max(g.start.h + dy, minSize.h),
-      });
+      // Left/top grips move the origin and keep the opposite edge fixed.
+      const right = start.x + start.w;
+      const bottom = start.y + start.h;
+      const x = kind.w ? Math.min(Math.max(start.x + dx, Math.min(start.x, 0)), right - minSize.w) : start.x;
+      const y = kind.n ? Math.min(Math.max(start.y + dy, inset.top), bottom - minSize.h) : start.y;
+      next = {
+        x,
+        y,
+        w: kind.w ? right - x : kind.e ? Math.max(start.w + dx, minSize.w) : start.w,
+        h: kind.n ? bottom - y : kind.s ? Math.max(start.h + dy, minSize.h) : start.h,
+      };
     }
+    g.latest = next;
+    setLiveFrame(next);
   };
 
   const endGesture = () => {
+    const last = gesture.current?.latest;
     gesture.current = null;
+    if (last) onFrameChange(last);
+    setLiveFrame(null);
   };
 
   const gap = theme === "mac" && !isMobile ? 6 : 0;
@@ -166,7 +204,7 @@ export function Window({
         height: `calc(100dvh - ${inset.top + inset.bottom + gap * 2}px)`,
         zIndex,
       }
-    : { left: frame.x, top: frame.y, width: frame.w, height: frame.h, zIndex };
+    : { left: shown.x, top: shown.y, width: shown.w, height: shown.h, zIndex };
 
   const dragProps = {
     onPointerDown: beginGesture("move"),
@@ -180,29 +218,35 @@ export function Window({
     onDoubleClick: (e: React.MouseEvent) => e.stopPropagation(),
   };
 
-  const resizeHandle = !fullscreen && (
-    <div
-      aria-hidden="true"
-      // Rounded corners clip hit-testing, so tuck the grip inside the curve.
-      className={`absolute z-20 cursor-nwse-resize ${theme === "win" ? "right-0 bottom-0 h-4 w-4" : "right-1 bottom-1 h-5 w-5"}`}
-      onPointerDown={beginGesture("resize")}
-      onPointerMove={onPointerMove}
-      onPointerUp={endGesture}
-      onPointerCancel={endGesture}
-    />
+  // The positioned frame holds the window and its resize grips, which sit partly outside the
+  // window's rounded clip. Clicking anywhere in it brings the window forward.
+  const frameShell = (windowEl: React.ReactNode) => (
+    <div className={`fixed ${minimized ? "hidden" : ""}`} style={style} onPointerDown={onFocus}>
+      {windowEl}
+      {!fullscreen &&
+        RESIZE_GRIPS.map(({ edges, className }) => (
+          <div
+            key={className}
+            aria-hidden="true"
+            className={`absolute z-20 touch-none ${className}`}
+            onPointerDown={beginGesture(edges)}
+            onPointerMove={onPointerMove}
+            onPointerUp={endGesture}
+            onPointerCancel={endGesture}
+          />
+        ))}
+    </div>
   );
 
   // ---------- Windows 11 ----------
   if (theme === "win") {
-    return (
+    return frameShell(
       <section
         role="dialog"
         aria-label={title}
-        className={`win-window ${active ? "" : "inactive"} ${fullscreen ? "maximized" : ""} window-pop fixed flex flex-col ${minimized ? "hidden" : ""}`}
-        style={style}
-        onPointerDown={onFocus}
+        className={`win-window ${active ? "" : "inactive"} ${fullscreen ? "maximized" : ""} window-pop absolute inset-0 flex flex-col`}
       >
-        <header className="win-titlebar flex h-8 shrink-0 items-center select-none" {...dragProps}>
+        <header className="win-titlebar flex h-8 shrink-0 touch-none items-center select-none" {...dragProps}>
           <span className="ml-3 h-4 w-4 shrink-0">{icon}</span>
           <span className="ml-2.5 min-w-0 grow truncate">{title}</span>
           <div className="flex h-full items-stretch" {...stop}>
@@ -240,19 +284,16 @@ export function Window({
         <div key={contentKey} className="min-h-0 grow overflow-auto">
           {children}
         </div>
-        {resizeHandle}
-      </section>
+      </section>,
     );
   }
 
   // ---------- Safari (macOS Tahoe) ----------
-  return (
+  return frameShell(
     <section
       role="dialog"
       aria-label={title}
-      className={`mac-window ${active ? "" : "inactive"} ${fullscreen ? "maximized" : ""} window-pop fixed flex flex-col ${minimized ? "hidden" : ""}`}
-      style={style}
-      onPointerDown={onFocus}
+      className={`mac-window ${active ? "" : "inactive"} ${fullscreen ? "maximized" : ""} window-pop absolute inset-0 flex flex-col`}
     >
       {/* The page scrolls underneath the translucent toolbar, as in Safari 26. */}
       <div
@@ -263,7 +304,7 @@ export function Window({
         {children}
       </div>
 
-      <header className="mac-toolbar absolute inset-x-0 top-0 z-10 select-none" {...dragProps}>
+      <header className="mac-toolbar absolute inset-x-0 top-0 z-10 touch-none select-none" {...dragProps}>
         <div
           className="grid items-center gap-2 px-3.5 sm:gap-3"
           style={{
@@ -338,8 +379,9 @@ export function Window({
           )}
 
           {safari && (
-            <div className="flex justify-end" {...stop}>
-              <div className="mac-capsule flex">
+            // Only the capsule blocks dragging; the empty space beside it is still title bar.
+            <div className="flex justify-end">
+              <div className="mac-capsule flex" {...stop}>
                 {safari.share ? (
                   <a
                     href={safari.share.href}
@@ -361,8 +403,6 @@ export function Window({
           )}
         </div>
       </header>
-
-      {resizeHandle}
-    </section>
+    </section>,
   );
 }

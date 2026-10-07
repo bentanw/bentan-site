@@ -316,10 +316,12 @@ export function Desktop({ data }: { data: SiteData }) {
     );
   }
 
-  const openIds = Object.keys(windows)
-    .filter((id) => pageInfo(pageOf(windows[id])))
-    .sort((a, b) => windows[a].z - windows[b].z);
-  const frontId = openIds.filter((id) => !windows[id].minimized).at(-1);
+  // Keep windows in opening order in the DOM and stack them with z-index only: reordering the
+  // nodes on focus would replay the open animation, reset scroll, and drop an in-progress drag.
+  const openIds = Object.keys(windows).filter((id) => pageInfo(pageOf(windows[id])));
+  const frontId = openIds
+    .filter((id) => !windows[id].minimized)
+    .reduce<string | undefined>((top, id) => (top && windows[top].z > windows[id].z ? top : id), undefined);
 
   const windowLayer = openIds.map((id) => {
     const w = windows[id];
