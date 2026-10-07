@@ -1,0 +1,897 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+/* Custom classes live in the components layer so Tailwind utilities (fixed, hidden, …) can override them. */
+@layer components {
+  /* ======================================================================
+     Windows 11 theme (Fluent)
+     ====================================================================== */
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--color-win-desktop);
+    color: var(--color-win-text);
+    font-family: var(--font-win);
+    font-size: 14px;
+    overscroll-behavior: none;
+    -webkit-font-smoothing: antialiased;
+    /* No double-tap zoom or grey tap flashes on phones. */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  [data-theme="win"] {
+    font-family: var(--font-win);
+    font-size: 14px;
+    color: var(--color-win-text);
+  }
+
+  .win-desktop {
+    background: var(--color-win-desktop) url("/wallpaper.svg") center / cover no-repeat;
+  }
+
+  /* ---------- Windows ---------- */
+
+  .win-window {
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.1),
+      0 32px 64px rgba(0, 0, 0, 0.24),
+      0 2px 21px rgba(0, 0, 0, 0.18);
+  }
+
+  .win-window.inactive {
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.08),
+      0 16px 32px rgba(0, 0, 0, 0.16),
+      0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .win-window.maximized {
+    border-radius: 0;
+  }
+
+  /* Mica-tinted title bar */
+  .win-titlebar {
+    background: #eef2f9;
+    color: var(--color-win-text);
+    font-size: 12px;
+  }
+
+  .win-window.inactive .win-titlebar {
+    background: #f6f7f9;
+    color: #8a8a8a;
+  }
+
+  .win-cap {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    color: var(--color-win-text);
+    transition: background 80ms linear;
+  }
+
+  .win-window.inactive .win-cap {
+    color: #8a8a8a;
+  }
+
+  .win-cap:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  .win-cap:active {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  .win-cap.close:hover {
+    background: #c42b1c;
+    color: #fff;
+  }
+
+  .win-cap.close:active {
+    background: #c83c31;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  /* ---------- Taskbar ---------- */
+
+  .win-taskbar {
+    background: rgba(238, 242, 250, 0.82);
+    -webkit-backdrop-filter: blur(30px) saturate(160%);
+    backdrop-filter: blur(30px) saturate(160%);
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.08);
+    color: var(--color-win-text);
+  }
+
+  .win-task {
+    position: relative;
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    transition: background 100ms linear;
+  }
+
+  .win-task:hover,
+  .win-task.active {
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+
+  .win-task:active > :first-child {
+    transform: scale(0.88);
+  }
+
+  .win-task > :first-child {
+    transition: transform 120ms ease;
+  }
+
+  .win-task-dot {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 6px;
+    height: 3px;
+    border-radius: 2px;
+    background: transparent;
+    transform: translateX(-50%);
+    transition:
+      width 180ms ease,
+      background 180ms ease;
+  }
+
+  .win-task.open .win-task-dot {
+    background: #8a8a8a;
+  }
+
+  .win-task.active .win-task-dot {
+    width: 16px;
+    background: var(--color-win-accent);
+  }
+
+  .win-tray-btn {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+
+  .win-tray-btn:hover {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  /* ---------- Start menu ---------- */
+
+  @keyframes start-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .win-startmenu {
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(242, 244, 249, 0.86);
+    -webkit-backdrop-filter: blur(40px) saturate(160%);
+    backdrop-filter: blur(40px) saturate(160%);
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.08),
+      0 32px 64px rgba(0, 0, 0, 0.24),
+      0 2px 21px rgba(0, 0, 0, 0.18);
+    color: var(--color-win-text);
+    animation: start-rise 200ms cubic-bezier(0.1, 0.9, 0.2, 1);
+  }
+
+  .win-startmenu-footer {
+    background: rgba(0, 0, 0, 0.03);
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  .win-start-app {
+    border-radius: 4px;
+  }
+
+  .win-start-app:hover {
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+
+  /* ---------- Desktop icons ---------- */
+
+  .win-icon {
+    border-radius: 4px;
+    border: 1px solid transparent;
+  }
+
+  .win-icon:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .win-icon.selected {
+    background: rgba(255, 255, 255, 0.24);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .win-icon:focus-visible {
+    border-color: #fff;
+  }
+
+  .win-icon-label {
+    color: #fff;
+    text-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.7),
+      0 0 6px rgba(0, 0, 0, 0.35);
+  }
+
+  @keyframes window-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .window-pop {
+    animation: window-pop 120ms ease-out;
+  }
+
+  /* ======================================================================
+     macOS Tahoe theme
+     ====================================================================== */
+
+  [data-theme="mac"] {
+    font-family: var(--font-sf);
+    font-size: 14px;
+    color: var(--color-mac-text);
+    letter-spacing: -0.005em;
+  }
+
+  /* Liquid Glass material (Dock): translucent, blurred, with a bright specular rim. */
+  .lg {
+    position: relative;
+    isolation: isolate;
+    background: rgba(255, 255, 255, 0.16);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    box-shadow:
+      inset 1px 1px 0 rgba(255, 255, 255, 0.65),
+      inset -1px -1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 0 22px rgba(255, 255, 255, 0.14),
+      0 10px 36px rgba(10, 20, 60, 0.22);
+  }
+
+  .lg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    background:
+      radial-gradient(120% 80% at 15% 0%, rgba(255, 255, 255, 0.42), transparent 55%),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.14), transparent 40%);
+  }
+
+  /* Chromium can run an SVG filter on the backdrop, which gives the lens-like edge refraction. */
+  html.refract .lg.refract {
+    backdrop-filter: url(#lg-refract) blur(3px) saturate(185%);
+  }
+
+  /* ---------- Menu bar (transparent, with a legibility scrim) ---------- */
+
+  .mac-menubar {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.26), rgba(0, 0, 0, 0.08) 75%, transparent);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .mac-menu-btn {
+    border-radius: 6px;
+  }
+
+  .mac-menu-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  /* ---------- Dock ---------- */
+
+  .mac-dock {
+    border-radius: 24px;
+  }
+
+  .mac-dock-item {
+    transition:
+      transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      margin 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform-origin: bottom center;
+  }
+
+  .mac-dock-item:hover {
+    transform: translateY(-8px) scale(1.22);
+    margin: 0 8px;
+  }
+
+  .mac-dock-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .mac-dock-item:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.85);
+    outline-offset: 2px;
+    border-radius: 14px;
+  }
+
+  .mac-dock-item:active svg {
+    filter: brightness(0.8);
+  }
+
+  .mac-tooltip {
+    background: rgba(36, 36, 40, 0.55);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    box-shadow:
+      0 0 0 0.5px rgba(255, 255, 255, 0.25),
+      0 4px 12px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    opacity: 0;
+    transform: translate(-50%, 4px) scale(0.82);
+    transition: all 120ms ease;
+  }
+
+  .mac-dock-item:hover .mac-tooltip {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(0.82);
+  }
+
+  /* ---------- Safari window ---------- */
+
+  .mac-window {
+    border-radius: 26px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.25),
+      0 28px 70px -12px rgba(0, 0, 0, 0.5),
+      0 8px 24px rgba(0, 0, 0, 0.16);
+  }
+
+  .mac-window.inactive {
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.2),
+      0 16px 40px -10px rgba(0, 0, 0, 0.32);
+  }
+
+  .mac-window.maximized {
+    border-radius: 18px;
+  }
+
+  .mac-page {
+    background: #fff;
+  }
+
+  /* Frosted toolbar the page scrolls underneath (Safari 26's scroll-edge effect). */
+  .mac-toolbar {
+    background: linear-gradient(to bottom, rgba(250, 250, 252, 0.88), rgba(246, 246, 248, 0.78));
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    backdrop-filter: blur(24px) saturate(190%);
+    box-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .mac-window.inactive .mac-toolbar {
+    background: rgba(246, 246, 248, 0.92);
+  }
+
+  /* Toolbar items float in glass capsules. */
+  .mac-capsule {
+    height: 34px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.12),
+      0 1px 4px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    color: #3c3c43;
+  }
+
+  .mac-window.inactive .mac-capsule {
+    color: rgba(60, 60, 67, 0.55);
+  }
+
+  .mac-tool {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 34px;
+    border-radius: 9999px;
+    color: inherit;
+  }
+
+  .mac-tool:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .mac-tool:active:not(:disabled) {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .mac-tool:disabled {
+    color: rgba(60, 60, 67, 0.28);
+  }
+
+  .mac-address {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-mac-text);
+    cursor: text;
+  }
+
+  .mac-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(29, 29, 31, 0.85);
+  }
+
+  .mac-light {
+    width: 13px;
+    height: 13px;
+    border-radius: 9999px;
+    display: grid;
+    place-items: center;
+    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.18);
+    cursor: default;
+  }
+
+  .mac-light svg {
+    opacity: 0;
+  }
+
+  .mac-lights:hover .mac-light svg {
+    opacity: 1;
+  }
+
+  .mac-window.inactive .mac-lights:not(:hover) .mac-light {
+    background: #d9d9dc !important;
+  }
+
+  /* ======================================================================
+     Windows ⇄ macOS switch (Windows Start menu, macOS settings popover)
+     ====================================================================== */
+
+  .os-switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    height: 34px;
+    padding: 3px;
+    border-radius: 9999px;
+    background: rgba(118, 118, 128, 0.14);
+    box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+    color: #3c3c43;
+    font: 600 13px/1 var(--font-sf);
+    letter-spacing: 0;
+    cursor: pointer;
+  }
+
+  [data-theme="win"] .os-switch {
+    font-family: var(--font-win);
+  }
+
+  .os-switch:focus-visible {
+    outline: 2px solid var(--color-mac-accent);
+    outline-offset: 2px;
+  }
+
+  .os-switch-thumb {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    border-radius: 9999px;
+    background: linear-gradient(to bottom, #fff, #f4f5f8);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.22),
+      0 0 0 0.5px rgba(0, 0, 0, 0.06);
+    transition: transform 340ms cubic-bezier(0.3, 1.35, 0.5, 1);
+  }
+
+  .os-switch[data-on="true"] .os-switch-thumb {
+    transform: translateX(100%);
+  }
+
+  .os-switch-opt {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 100%;
+    padding: 0 12px;
+    transition: color 250ms ease;
+  }
+
+  .os-switch[data-on="false"] .os-switch-opt:nth-child(2),
+  .os-switch[data-on="true"] .os-switch-opt:nth-child(3) {
+    color: var(--color-mac-text);
+  }
+
+  .os-switch-glyph {
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+  }
+
+  /* ---------- macOS settings popover ---------- */
+
+  .mac-popover {
+    background: rgba(246, 246, 248, 0.78);
+    -webkit-backdrop-filter: blur(30px) saturate(190%);
+    backdrop-filter: blur(30px) saturate(190%);
+    border-radius: 16px;
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 14px 40px rgba(0, 0, 0, 0.28);
+    color: var(--color-mac-text);
+    text-shadow: none;
+    transform-origin: top left;
+    animation: window-pop 120ms ease-out;
+  }
+
+  /* ======================================================================
+     Theme-aware building blocks used inside windows
+     ====================================================================== */
+
+  /* Page backgrounds */
+  [data-theme="win"] .ui-page {
+    background: var(--color-win-surface);
+  }
+
+  [data-theme="mac"] .ui-page {
+    background: var(--color-mac-surface);
+  }
+
+  /* Buttons */
+  [data-theme="win"] .ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 96px;
+    min-height: 32px;
+    padding: 5px 12px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom-color: rgba(0, 0, 0, 0.16);
+    border-radius: 4px;
+    background: #fbfbfb;
+    color: var(--color-win-text);
+    font-size: 14px;
+    cursor: default;
+  }
+
+  [data-theme="win"] .ui-btn:hover {
+    background: #f6f6f6;
+  }
+
+  [data-theme="win"] .ui-btn:active {
+    background: #f3f3f3;
+    border-bottom-color: rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.62);
+  }
+
+  [data-theme="win"] .ui-btn.primary {
+    border-color: rgba(255, 255, 255, 0.08);
+    border-bottom-color: rgba(0, 0, 0, 0.4);
+    background: var(--color-win-accent);
+    color: #fff;
+  }
+
+  [data-theme="win"] .ui-btn.primary:hover {
+    background: #196ebf;
+  }
+
+  [data-theme="win"] .ui-btn.primary:active {
+    background: #3183ca;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  [data-theme="mac"] .ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 6px 18px;
+    border-radius: 9999px;
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--color-mac-text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      transform 120ms ease,
+      background 120ms ease;
+  }
+
+  [data-theme="mac"] .ui-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="mac"] .ui-btn:active {
+    transform: scale(0.97);
+  }
+
+  [data-theme="mac"] .ui-btn.primary {
+    background: var(--color-mac-accent);
+    color: #fff;
+  }
+
+  [data-theme="mac"] .ui-btn.primary:hover {
+    background: #0077ed;
+  }
+
+  /* Text inputs */
+  [data-theme="win"] .ui-field {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-bottom-color: #868686;
+    border-radius: 4px;
+    background: #fff;
+    padding: 5px 10px;
+  }
+
+  [data-theme="win"] .ui-field:focus {
+    border-bottom: 2px solid var(--color-win-accent);
+    padding-bottom: 4px;
+  }
+
+  [data-theme="mac"] .ui-field {
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    padding: 7px 10px;
+  }
+
+  [data-theme="mac"] .ui-field:focus {
+    box-shadow: 0 0 0 3.5px rgba(0, 113, 227, 0.35);
+    border-color: var(--color-mac-accent);
+  }
+
+  /* Headings, links, muted text */
+  [data-theme="win"] .ui-h {
+    font-family: var(--font-win-display);
+    font-weight: 600;
+    color: var(--color-win-text);
+  }
+
+  [data-theme="mac"] .ui-h {
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    color: var(--color-mac-text);
+  }
+
+  [data-theme="win"] .ui-eyebrow {
+    margin-bottom: 4px;
+    color: var(--color-win-accent);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  [data-theme="mac"] .ui-eyebrow {
+    margin-bottom: 6px;
+    color: var(--color-mac-accent);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  [data-theme="win"] .ui-section {
+    border-bottom: 0;
+  }
+
+  [data-theme="mac"] .ui-section {
+    border-bottom: 0;
+  }
+
+  [data-theme="win"] .ui-link {
+    color: var(--color-win-accent);
+  }
+
+  [data-theme="mac"] .ui-link {
+    color: #0066cc;
+  }
+
+  .ui-link:hover {
+    text-decoration: underline;
+  }
+
+  [data-theme="win"] .ui-muted {
+    color: var(--color-win-text-secondary);
+  }
+
+  [data-theme="mac"] .ui-muted {
+    color: var(--color-mac-text-secondary);
+  }
+
+  /* Chips */
+  [data-theme="win"] .ui-chip {
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.04);
+    color: #3d3d3d;
+    border-radius: 4px;
+  }
+
+  [data-theme="mac"] .ui-chip {
+    background: rgba(0, 0, 0, 0.05);
+    color: #424245;
+    border-radius: 9999px;
+  }
+
+  /* Project cards and screenshots */
+  .ui-card {
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease;
+  }
+
+  [data-theme="win"] .ui-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  [data-theme="win"] .ui-card:hover,
+  [data-theme="win"] .ui-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  [data-theme="win"] .ui-card:focus-visible {
+    outline: 2px solid var(--color-win-text);
+    outline-offset: 2px;
+  }
+
+  [data-theme="win"] .ui-card-media {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  [data-theme="win"] .ui-shot {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  [data-theme="mac"] .ui-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  [data-theme="mac"] .ui-card:hover,
+  [data-theme="mac"] .ui-card:focus-visible {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+  }
+
+  [data-theme="mac"] .ui-card:focus-visible {
+    outline: 3px solid rgba(0, 113, 227, 0.5);
+  }
+
+  [data-theme="mac"] .ui-shot {
+    border-radius: 18px;
+    box-shadow:
+      0 0 0 0.5px rgba(0, 0, 0, 0.08),
+      0 12px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  /* ======================================================================
+     Phones and touch screens
+     ====================================================================== */
+
+  /* Same breakpoint as MOBILE_QUERY in src/lib/constants/layout.ts. */
+  @media (max-width: 640px), (max-height: 500px) {
+    /* Windows fill the screen edge to edge on phones. */
+    .mac-window.maximized {
+      border-radius: 0;
+    }
+
+    .mac-dock-icon {
+      width: 44px;
+      height: 44px;
+    }
+
+    /* iOS zooms into any focused field under 16px. */
+    .ui-field {
+      font-size: 16px;
+    }
+
+    [data-theme="win"] .ui-btn {
+      min-width: 0;
+    }
+  }
+
+  /* Touch screens keep :hover after a tap, so drop hover-only effects there. */
+  @media (hover: none) {
+    .mac-dock-item:hover {
+      transform: none;
+      margin: 0;
+    }
+
+    .mac-dock-item:hover .mac-tooltip {
+      opacity: 0;
+    }
+
+    .ui-card:hover {
+      transform: none;
+    }
+
+    .win-icon:hover:not(.selected),
+    .win-task:hover:not(.active),
+    .win-tray-btn:hover,
+    .win-start-app:hover {
+      background: transparent;
+      box-shadow: none;
+    }
+  }
+
+  /* ======================================================================
+     Resume document (same paper look in both themes)
+     ====================================================================== */
+
+  .resume-doc {
+    font-family: "Latin Modern Roman", "CMU Serif", "Computer Modern", Georgia, "Times New Roman", serif;
+    color: #000;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .resume-doc h2 {
+    font-variant: small-caps;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid #000;
+    margin: 14px 0 6px;
+    padding-bottom: 1px;
+  }
+
+  .resume-doc a {
+    text-decoration: underline;
+  }
+
+  @media print {
+    @page {
+      margin: 0.5in;
+    }
+    .no-print {
+      display: none !important;
+    }
+    .resume-page {
+      box-shadow: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      max-width: none !important;
+    }
+    body {
+      background: #fff !important;
+    }
+  }
+}

@@ -1,0 +1,75 @@
+/*
+ * Design tokens. Tailwind turns each one into utilities, so use the name instead of a raw value:
+ *   --color-paper-backdrop  →  bg-paper-backdrop, text-paper-backdrop, …
+ *   --text-ui               →  text-ui
+ *   --spacing-letter-x      →  px-letter-x
+ * globals.css reuses the same tokens with var(). Values only JavaScript needs live in src/lib/constants/.
+ */
+@theme {
+  /* ---------- Fonts ---------- */
+  --font-win: "Segoe UI Variable Text", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-win-display:
+    "Segoe UI Variable Display", "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-sf: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  /* ---------- Windows 11 palette ---------- */
+  --color-win-desktop: #0b3aa8; /* behind the wallpaper and on the loading screen */
+  --color-win-text: #1a1a1a;
+  --color-win-text-secondary: #5d5d5d;
+  --color-win-accent: #005fb8;
+  --color-win-surface: #f9f9f9; /* page and command-bar background */
+  --color-win-avatar-top: #4fb4ff;
+  --color-win-avatar-bottom: #0a5bd3;
+
+  /* ---------- macOS palette ---------- */
+  --color-mac-desktop: #123a8c; /* shown until the wallpaper shader paints */
+  --color-mac-text: #1d1d1f;
+  --color-mac-text-secondary: #6e6e73;
+  --color-mac-text-tertiary: #86868b;
+  --color-mac-accent: #0071e3;
+  --color-mac-surface: #f5f5f7;
+  --color-mac-avatar-top: #a1a1a6;
+  --color-mac-close: #ff5f57; /* traffic lights */
+  --color-mac-minimize: #febc2e;
+  --color-mac-zoom: #28c840;
+
+  /* ---------- Resume ---------- */
+  --color-paper-backdrop: #e8e8ed; /* grey behind the resume page */
+
+  /* ---------- Type sizes Tailwind's scale doesn't have ---------- */
+  --text-2xs: 11px; /* chips and captions */
+  --text-ui: 13px; /* menu bar, tooltips, small links (macOS body size) */
+  --text-lede: 17px;
+  --text-title: 22px;
+  --text-resume-name: 28px;
+  --text-display: 34px;
+  --text-hero-mac: clamp(34px, 6cqw, 56px); /* scale with the window, not the screen */
+  --text-hero-win: clamp(28px, 4.5cqw, 40px);
+  --text-hero-lede-mac: clamp(17px, 2.2cqw, 21px);
+  --leading-display: 1.05;
+
+  /* ---------- Layout ---------- */
+  --container-letter: 8.5in; /* US Letter page width: max-w-letter */
+  --container-two-up: 760px; /* Home shows two project columns once its window is this wide: @two-up: */
+  --breakpoint-xs: 420px; /* narrow phones: max-xs: */
+  --spacing-letter-x: 0.6in; /* printed resume margins */
+  --spacing-letter-y: 0.5in;
+  --spacing-resume-indent: 0.15in; /* indent used by the LaTeX template */
+  --spacing-logo: min(42vh, 320px); /* liquid-metal monogram on the macOS desktop */
+  --aspect-screenshot: 16 / 10;
+
+  /* ---------- Shadows ---------- */
+  --shadow-paper: 0 2px 10px rgba(0, 0, 0, 0.12);
+  --inset-shadow-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  --drop-shadow-dock-icon: 0 3px 5px rgba(0, 0, 0, 0.22);
+  --drop-shadow-desktop-icon: 0 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Stacking: windows start at z-index 10 and climb as they're focused; the OS chrome always sits above. */
+@utility z-chrome {
+  z-index: 9000;
+}
+
+@utility z-menu {
+  z-index: 9001;
+}
