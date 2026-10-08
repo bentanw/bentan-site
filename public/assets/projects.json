@@ -7,6 +7,14 @@
     {
       "name": "Recall - Find Gamer Friends",
       "url": "https://www.recallgamingapp.com/"
+    },
+    {
+      "name": "Tenti App",
+      "url": "https://tenti-app.vercel.app",
+      "repo": "https://github.com/bentanw/tenti-app",
+      "description": "One workspace for creators that replaces Notion, Otter.ai and Linktree: plan videos in databases, turn recordings into Whisper transcripts, and share everything from a link-in-bio page.",
+      "tag": "Web App",
+      "stack": ["TanStack Start", "React", "Supabase", "PostgreSQL", "Tailwind", "Whisper"]
     }
   ]
 }
