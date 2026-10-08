@@ -1,0 +1,14 @@
+{
+  "photo": "ben-2022.jpg",
+  "intro": "I am currently a Software Engineer at Mutual of Omaha. Previously, I was at BNY.",
+  "skills": [
+    {
+      "label": "Languages",
+      "items": ["Python", "TypeScript", "Java"]
+    },
+    {
+      "label": "Frameworks",
+      "items": ["React", "Spring Boot", "Vue", "FastAPI"]
+    }
+  ]
+}

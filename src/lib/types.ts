@@ -47,9 +47,18 @@ export type Job = {
   location: string;
 };
 
+/** Hand-written intro and highlighted skills for the Home window. */
+export type About = {
+  /** Public path of a photo of the site owner, when one exists. */
+  photo?: string;
+  intro: string;
+  skills: { label: string; items: string[] }[];
+};
+
 export type SiteData = {
   resume: Resume;
   projects: Project[];
   headline: string;
   current?: Job;
+  about?: About;
 };

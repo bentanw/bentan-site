@@ -5,12 +5,13 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { plain } from "./latex.ts";
 import { parseResume } from "./resume.ts";
-import type { Job, Project, Resume, SiteData } from "./types.ts";
+import type { About, Job, Project, Resume, SiteData } from "./types.ts";
 
 const ROOT = process.cwd();
 export const PUBLIC_ASSETS_DIR = path.join(ROOT, "public", "assets");
 export const RESUME_TEX = path.join(PUBLIC_ASSETS_DIR, "ben_tan_resume.tex");
 export const PROJECTS_JSON = path.join(PUBLIC_ASSETS_DIR, "projects.json");
+export const ABOUT_JSON = path.join(PUBLIC_ASSETS_DIR, "about.json");
 export const PREVIEW_DIR = path.join(ROOT, "public", "previews");
 export const PREVIEW_META = path.join(ROOT, ".cache", "previews.json");
 
@@ -58,6 +59,23 @@ export function loadOverrides(): ProjectOverride[] {
   const raw = readJson<{ projects?: ProjectOverride[] } | ProjectOverride[]>(PROJECTS_JSON, []);
   const list = Array.isArray(raw) ? raw : (raw.projects ?? []);
   return list.filter((p) => p && typeof p.name === "string");
+}
+
+/** The Home window's About me section, from public/assets/about.json; absent if the file is missing or empty. */
+export function loadAbout(): About | undefined {
+  const raw = readJson<Partial<About>>(ABOUT_JSON, {});
+  const intro = typeof raw.intro === "string" ? raw.intro.trim() : "";
+  const skills = (raw.skills ?? []).filter((g) => g && typeof g.label === "string" && g.items?.length);
+  const photo = resolveAsset(raw.photo);
+  return intro || skills.length || photo ? { photo, intro, skills } : undefined;
+}
+
+/** An http(s) URL as is, or a file name inside public/assets/ as its public path (if the file exists). */
+function resolveAsset(ref: string | undefined): string | undefined {
+  if (!ref) return undefined;
+  if (/^https?:\/\//.test(ref)) return ref;
+  const file = path.basename(ref);
+  return existsSync(path.join(PUBLIC_ASSETS_DIR, file)) ? `/assets/${file}` : undefined;
 }
 
 const DOMAIN_RE = /^[\w-]+(\.[\w-]+)+(\/\S*)?$/;
@@ -123,11 +141,8 @@ function applyOverride(p: Project, o: ProjectOverride): Project {
 }
 
 function resolvePreview(p: Project): string | undefined {
-  if (p.preview && /^https?:\/\//.test(p.preview)) return p.preview;
-  if (p.preview) {
-    const file = path.basename(p.preview);
-    if (existsSync(path.join(PUBLIC_ASSETS_DIR, file))) return `/assets/${file}`;
-  }
+  const custom = resolveAsset(p.preview);
+  if (custom) return custom;
   const candidates = ["png", "jpg", "jpeg", "webp"].map((ext) => `${p.slug}.${ext}`);
   const hit = candidates.find((file) => existsSync(path.join(PREVIEW_DIR, file)));
   return hit ? `/previews/${hit}` : undefined;
@@ -153,6 +168,7 @@ export function loadSiteData(): SiteData {
     resume,
     projects,
     current,
+    about: loadAbout(),
     headline: current ? `${current.role} at ${current.company}` : "Software Engineer",
   };
 }

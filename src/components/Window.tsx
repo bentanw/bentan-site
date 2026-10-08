@@ -32,7 +32,8 @@ type WindowProps = {
   safari?: SafariChrome;
   minSize?: { w: number; h: number };
   onFocus: () => void;
-  onClose: () => void;
+  /** Omit to keep the window open: it has no close control. */
+  onClose?: () => void;
   onMinimize: () => void;
   onToggleMaximize: () => void;
   onFrameChange: (frame: WindowFrame) => void;
@@ -270,15 +271,17 @@ export function Window({
                 <CaptionGlyph kind={maximized ? "restore" : "max"} />
               </button>
             )}
-            <button
-              type="button"
-              aria-label={`Close ${title}`}
-              title="Close"
-              className="win-cap close"
-              onClick={onClose}
-            >
-              <CaptionGlyph kind="close" />
-            </button>
+            {onClose && (
+              <button
+                type="button"
+                aria-label={`Close ${title}`}
+                title="Close"
+                className="win-cap close"
+                onClick={onClose}
+              >
+                <CaptionGlyph kind="close" />
+              </button>
+            )}
           </div>
         </header>
         <div key={contentKey} className="min-h-0 grow overflow-auto">
@@ -314,9 +317,16 @@ export function Window({
         >
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="mac-lights flex items-center gap-2" {...stop}>
-              <button type="button" aria-label={`Close ${title}`} className="mac-light bg-mac-close" onClick={onClose}>
-                <LightGlyph kind="close" />
-              </button>
+              {onClose && (
+                <button
+                  type="button"
+                  aria-label={`Close ${title}`}
+                  className="mac-light bg-mac-close"
+                  onClick={onClose}
+                >
+                  <LightGlyph kind="close" />
+                </button>
+              )}
               <button
                 type="button"
                 aria-label={`Minimize ${title}`}

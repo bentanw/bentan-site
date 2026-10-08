@@ -61,6 +61,9 @@ const SOUND_KEY = "ambience";
 
 const pageOf = (w: WindowState) => w.history[w.index];
 
+/** Home stays open: it can be minimized but not closed. */
+const closable = (id: string) => id !== "home";
+
 /** The launcher section a page belongs to (project pages are opened from Home). */
 const sectionOf = (page: string) => LAUNCH_ITEMS.find((i) => i.id === page)?.label ?? "Home";
 
@@ -142,7 +145,7 @@ export function Desktop({ data }: { data: SiteData }) {
 
   useEffect(() => {
     const saved = readPref(THEME_KEY);
-    setTheme(saved === "mac" || saved === "glass" ? "mac" : "win");
+    setTheme(saved === "win" ? "win" : "mac");
     setSiteHost(window.location.host);
   }, []);
 
@@ -170,7 +173,7 @@ export function Desktop({ data }: { data: SiteData }) {
 
   // Everything that can be shown in a window (or Safari tab), keyed by page id.
   const pageInfo = (page: string): PageInfo | null => {
-    const t = theme ?? "win";
+    const t = theme ?? "mac";
     const icon = (Win: IconComponent, Mac: IconComponent) =>
       t === "win" ? <Win className="h-full w-full" /> : <Mac className="h-full w-full" />;
     if (page === "home") {
@@ -234,7 +237,7 @@ export function Desktop({ data }: { data: SiteData }) {
   const open = (id: string) => {
     const info = pageInfo(id);
     if (!info) return;
-    const t = theme ?? "win";
+    const t = theme ?? "mac";
     const inset = insetsFor(t, isMobile);
     setStartOpen(false);
     setWindows((ws) => {
@@ -282,14 +285,14 @@ export function Desktop({ data }: { data: SiteData }) {
     );
   };
 
-  // Escape closes the front-most window (the Start menu handles its own Escape).
+  // Escape closes the front-most closable window (the Start menu handles its own Escape).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== "Escape" || startOpen) return;
       const front = Object.entries(windows)
         .filter(([, w]) => !w.minimized)
         .sort((a, b) => b[1].z - a[1].z)[0];
-      if (front) close(front[0]);
+      if (front && closable(front[0])) close(front[0]);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -308,7 +311,7 @@ export function Desktop({ data }: { data: SiteData }) {
   // Render nothing theme-specific until the saved theme is known, to avoid flashing the wrong one.
   if (!theme) {
     return (
-      <main className="h-dvh w-screen bg-win-desktop">
+      <main className="h-dvh w-screen bg-mac-desktop">
         <h1 className="sr-only">
           {resume.name} – {data.headline}
         </h1>
@@ -353,7 +356,7 @@ export function Desktop({ data }: { data: SiteData }) {
             : undefined
         }
         onFocus={() => focus(id)}
-        onClose={() => close(id)}
+        onClose={closable(id) ? () => close(id) : undefined}
         onMinimize={() => patch(id, { minimized: true })}
         onToggleMaximize={() => patch(id, { maximized: !w.maximized })}
         onFrameChange={(frame) => patch(id, { frame })}

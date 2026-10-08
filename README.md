@@ -22,6 +22,18 @@ npm run dev -- -p 3123 /** use a different port */
 
 `public/assets/ben_tan_resume.tex` is the source of truth for the Resume and Home windows. It is parsed during development and at build time to extract contact details, the current role, skills, experience, and projects. Editing it requires a refresh in development or a new production build.
 
+### About me
+
+`public/assets/about.json` holds the About me section at the top of the Home window. Every field is optional; the section is hidden when the file is missing or empty. `photo` is a web image URL or a file name in `public/assets/` (keep it small, around 512px square).
+
+```json
+{
+  "photo": "ben-2022.jpg",
+  "intro": "I am currently a Software Engineer at Mutual of Omaha.",
+  "skills": [{ "label": "Languages", "items": ["Python", "TypeScript", "Java"] }]
+}
+```
+
 ### Projects
 
 `public/assets/projects.json` supplements the projects parsed from the resume. Entries are matched to resume projects by name.

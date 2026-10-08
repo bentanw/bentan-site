@@ -4,10 +4,11 @@ import { loadSiteData } from "@/lib/site-data";
 import "./globals.css";
 
 export function generateMetadata(): Metadata {
-  const { resume, headline } = loadSiteData();
+  const { resume } = loadSiteData();
   return {
-    title: `${resume.name} · ${headline}`,
-    description: `${resume.name} – ${headline}. Projects, resume, and contact.`,
+    title: `${resume.name} · Software Engineer`,
+    description: `${resume.name} – Software Engineer. Projects, resume, and contact.`,
+    icons: { icon: "/favicon.jpg", apple: "/favicon.jpg" },
   };
 }
 
