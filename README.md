@@ -34,6 +34,10 @@ npm run dev -- -p 3123 /** use a different port */
 }
 ```
 
+### Event letters
+
+`/events/ask-sylvia-to-be-girlfriend` is a hand-written letter that opens from an envelope, with a question at the end. Its words and photos live in `public/assets/events/ask-sylvia-to-be-girlfriend/letter.json`; photo `file` names are resolved inside that folder, and `after` is the 0-based paragraph a photo follows. Optional `aspect` and `position` crop a photo (CSS `aspect-ratio` and `object-position`). The page is excluded from search engines.
+
 ### Projects
 
 `public/assets/projects.json` supplements the projects parsed from the resume. Entries are matched to resume projects by name.

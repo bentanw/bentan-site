@@ -65,6 +65,21 @@
   --drop-shadow-desktop-icon: 0 2px 3px rgba(0, 0, 0, 0.3);
 }
 
+/* Love letter at /events/ask-sylvia-to-be-girlfriend. `static` keeps these as CSS variables even though only
+   letter.module.css reads them (Tailwind can't see usage inside CSS modules). */
+@theme static {
+  --color-letter-blush: #fbe3e6;
+  --color-letter-peach: #fdeee2;
+  --color-letter-paper: #fffdf8;
+  --color-letter-ink: #33313a; /* pencil grey, like the card */
+  --color-letter-muted: #8a7f86;
+  --color-letter-rose: #e4637f;
+  --color-letter-rose-deep: #bf3f5d;
+  --color-letter-kraft: #d3b98f; /* the real envelope */
+  --color-letter-kraft-dark: #b99c70;
+  --color-letter-kraft-light: #dfc8a2;
+}
+
 /* Stacking: windows start at z-index 10 and climb as they're focused; the OS chrome always sits above. */
 @utility z-chrome {
   z-index: 9000;

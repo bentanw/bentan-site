@@ -1,0 +1,42 @@
+{
+  "title": "Ask Sylvia to be my girlfriend",
+  "envelope": "For Cutie Chenchen",
+  "greeting": "Sylvia,",
+  "paragraphs": [
+    "4 weeks ago I met you at a Japanese bookstore and the moment I saw you, I immediately thought about how to rizz you up. 4 weeks later, I am writing about how I feel about you.",
+    "I always think about you, no matter what time of the day is.",
+    "A lot of the times I wonder about what you are doing, sometimes wonder about what you are feeling, and sometimes I just wish I am cuddling you.",
+    "Even though it's only been a month, I feel like I've gotten to know so many different sides of you. I've seen you happy, 傻笑, drunk, upset, and everything in between. Though I don’t think it can get worse than Halloweekend Friday night (LOL)",
+    "We are probably not going to agree on everything and probably will annoy each other sometimes, we will probably even have moments when we don't understand each other. But I want us to keep figuring things out together. And yes, I'll try my best to 哄你 when you're upset (even though sometimes I might need you to 哄我 too).",
+    "So keep coming back to this letter whenever you want. Because I hope that when you read it again months or years from now, you'll know that I meant every word."
+  ],
+  "closing": "I like you a lot, like a lot a lot a lot",
+  "signature": "Ben",
+  "photos": [
+    {
+      "file": "3A61E399-8CCF-444B-8250-BCFF530544AA_4_5005_c.jpeg",
+      "alt": "Ben and Sylvia cuddled up close",
+      "after": 2
+    },
+    {
+      "file": "00D82B3A-6D74-456C-B251-B93D6E7D4654_1_105_c.jpeg",
+      "alt": "Ben and Sylvia in Halloween costumes, Sylvia wearing bunny ears",
+      "after": 3
+    },
+    {
+      "file": "FCE642CB-A3B1-4FA4-B8A8-C3201625406C_1_105_c.jpeg",
+      "alt": "Car selfie of Ben and Sylvia, Sylvia holding up her bunny ears",
+      "after": 4,
+      "aspect": "1 / 1",
+      "position": "50% 100%"
+    }
+  ],
+  "question": "So… Sylvia, will you be my girlfriend?",
+  "noReplies": ["No", "Are you sure?", "Think again", "Sylvia…", "Pretty please?", "Wrong button", "Nice try"],
+  "proposal": {
+    "file": "6E29A624-D72D-4AA4-8705-5AD84C00A2B9_1_105_c.jpeg",
+    "alt": "Sylvia holding a bouquet beside a car trunk with a teddy bear, candles, petals and a sign reading “Will you be my girlfriend, Sylvia”",
+    "date": "11.19.2026",
+    "caption": "the night I asked"
+  }
+}

@@ -5,13 +5,14 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { plain } from "./latex.ts";
 import { parseResume } from "./resume.ts";
-import type { About, Job, Project, Resume, SiteData } from "./types.ts";
+import type { About, EventLetter, Job, LetterPhoto, Project, Resume, SiteData } from "./types.ts";
 
 const ROOT = process.cwd();
 export const PUBLIC_ASSETS_DIR = path.join(ROOT, "public", "assets");
 export const RESUME_TEX = path.join(PUBLIC_ASSETS_DIR, "ben_tan_resume.tex");
 export const PROJECTS_JSON = path.join(PUBLIC_ASSETS_DIR, "projects.json");
 export const ABOUT_JSON = path.join(PUBLIC_ASSETS_DIR, "about.json");
+export const EVENTS_DIR = path.join(PUBLIC_ASSETS_DIR, "events");
 export const PREVIEW_DIR = path.join(ROOT, "public", "previews");
 export const PREVIEW_META = path.join(ROOT, ".cache", "previews.json");
 
@@ -68,6 +69,53 @@ export function loadAbout(): About | undefined {
   const skills = (raw.skills ?? []).filter((g) => g && typeof g.label === "string" && g.items?.length);
   const photo = resolveAsset(raw.photo);
   return intro || skills.length || photo ? { photo, intro, skills } : undefined;
+}
+
+type RawPhoto = { file?: string; alt?: string; aspect?: string; position?: string };
+
+/**
+ * The letter for /events/<slug>, from public/assets/events/<slug>/letter.json. Photo file names are resolved
+ * inside that folder; photos whose file is missing are dropped. Undefined if the letter is missing or empty.
+ */
+export function loadEventLetter(slug: string): EventLetter | undefined {
+  const dir = path.join(EVENTS_DIR, slug);
+  const raw = readJson<
+    Partial<Omit<EventLetter, "photos" | "proposal">> & {
+      photos?: (RawPhoto & { after?: number })[];
+      proposal?: RawPhoto & { date?: string; caption?: string };
+    }
+  >(path.join(dir, "letter.json"), {});
+  const paragraphs = (raw.paragraphs ?? []).filter((p) => typeof p === "string" && p.trim());
+  if (!paragraphs.length) return undefined;
+
+  const photo = (p: RawPhoto | undefined): LetterPhoto | undefined => {
+    const file = p?.file && path.basename(p.file);
+    return file && existsSync(path.join(dir, file))
+      ? {
+          src: `/assets/events/${slug}/${encodeURIComponent(file)}`,
+          alt: p.alt ?? "",
+          aspect: p.aspect,
+          position: p.position,
+        }
+      : undefined;
+  };
+  const proposal = photo(raw.proposal);
+
+  return {
+    title: raw.title ?? "A letter",
+    envelope: raw.envelope ?? "",
+    greeting: raw.greeting ?? "",
+    paragraphs,
+    closing: raw.closing ?? "",
+    signature: raw.signature ?? "",
+    photos: (raw.photos ?? []).flatMap((p) => {
+      const resolved = photo(p);
+      return resolved ? [{ ...resolved, after: p.after ?? 0 }] : [];
+    }),
+    question: raw.question ?? "",
+    noReplies: raw.noReplies?.length ? raw.noReplies : ["No"],
+    proposal: proposal && { ...proposal, date: raw.proposal?.date ?? "", caption: raw.proposal?.caption ?? "" },
+  };
 }
 
 /** An http(s) URL as is, or a file name inside public/assets/ as its public path (if the file exists). */

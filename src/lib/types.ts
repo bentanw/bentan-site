@@ -62,3 +62,29 @@ export type SiteData = {
   current?: Job;
   about?: About;
 };
+
+/** A photo placed in an event letter, already resolved to a public path. */
+export type LetterPhoto = {
+  src: string;
+  alt: string;
+  /** CSS aspect-ratio to crop to (default 3 / 4). */
+  aspect?: string;
+  /** CSS object-position for the crop (default centered). */
+  position?: string;
+};
+
+/** A hand-written letter page under /events/<slug>, from public/assets/events/<slug>/letter.json. */
+export type EventLetter = {
+  title: string;
+  envelope: string;
+  greeting: string;
+  paragraphs: string[];
+  closing: string;
+  signature: string;
+  /** Photos shown after the paragraph at `after` (0-based). */
+  photos: (LetterPhoto & { after: number })[];
+  question: string;
+  /** Labels the "No" button cycles through each time it is tried. */
+  noReplies: string[];
+  proposal?: LetterPhoto & { date: string; caption: string };
+};

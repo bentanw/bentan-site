@@ -1,0 +1,589 @@
+/* The love letter at /events/ask-sylvia-to-be-girlfriend. Colours are the --color-letter-* tokens in theme.css. */
+
+.page {
+  position: fixed;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: var(--color-letter-ink);
+  background:
+    radial-gradient(circle at 15% 8%, var(--color-letter-peach), transparent 55%),
+    radial-gradient(circle at 90% 95%, #f8cdd8, transparent 50%), var(--color-letter-blush);
+}
+
+/* Handwriting; Chinese characters (傻笑, 哄你) fall back to a Kai brush face where the system has one. */
+.hand {
+  font-family: var(--font-hand), "Kaiti SC", "STKaiti", "KaiTi", "BiauKai", cursive;
+}
+
+/* ---------- Hearts drifting up in the background ---------- */
+
+.floaters {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.floater {
+  position: absolute;
+  bottom: -40px;
+  left: var(--left);
+  width: var(--size);
+  height: var(--size);
+  color: var(--color-letter-rose);
+  opacity: 0;
+  animation: drift var(--dur) linear var(--delay) infinite;
+}
+
+@keyframes drift {
+  0% {
+    transform: translate(0, 0) rotate(-10deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.35;
+  }
+  50% {
+    transform: translate(14px, -55vh) rotate(10deg);
+  }
+  85% {
+    opacity: 0.25;
+  }
+  100% {
+    transform: translate(-8px, -115vh) rotate(-6deg);
+    opacity: 0;
+  }
+}
+
+/* ---------- Sealed envelope ---------- */
+
+.sealed {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  align-content: center;
+  gap: 36px;
+  padding: 24px;
+}
+
+.sealed[data-stage="opening"] {
+  animation: fade-out 420ms ease 1280ms forwards;
+}
+
+.envelope {
+  position: relative;
+  width: min(84vw, 400px);
+  aspect-ratio: 3 / 2;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 900px;
+  filter: drop-shadow(0 18px 28px rgba(140, 60, 75, 0.22));
+  animation: bob 3.4s ease-in-out infinite;
+  transition: scale 250ms ease;
+}
+
+.envelope:hover {
+  scale: 1.03;
+}
+
+.envelope:focus-visible {
+  outline: 3px solid var(--color-letter-rose-deep);
+  outline-offset: 10px;
+  border-radius: 8px;
+}
+
+.envelope[data-stage="opening"] {
+  cursor: default;
+  scale: 1.04;
+}
+
+.envBack {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: var(--color-letter-kraft-dark);
+}
+
+.envPaper {
+  position: absolute;
+  inset: 6% 7%;
+  z-index: 2;
+  border-radius: 3px;
+  background: var(--color-letter-paper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: transform 750ms cubic-bezier(0.2, 0.8, 0.2, 1) 520ms;
+}
+
+.envPaperLines {
+  position: absolute;
+  inset: 16% 12% 42%;
+  background: repeating-linear-gradient(to bottom, rgba(51, 49, 58, 0.2) 0 1px, transparent 1px 11px);
+}
+
+.envelope[data-stage="opening"] .envPaper {
+  transform: translateY(-62%);
+}
+
+.envPocket {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: 6px;
+  background: linear-gradient(165deg, var(--color-letter-kraft-light), var(--color-letter-kraft) 70%);
+  clip-path: polygon(0 0, 50% 56%, 100% 0, 100% 100%, 0 100%);
+}
+
+/* The wrapper carries the shadow (clip-path would cut it off the flap itself) and does the 3D flip. */
+.envFlapWrap {
+  position: absolute;
+  inset: 0 0 38% 0;
+  z-index: 4;
+  filter: drop-shadow(0 3px 2px rgba(100, 70, 40, 0.28));
+  transform-origin: top;
+  transition:
+    transform 600ms ease-in-out,
+    z-index 0s linear 300ms;
+}
+
+.envFlap {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, var(--color-letter-kraft-light), #cdb084);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.envelope[data-stage="opening"] .envFlapWrap {
+  z-index: 1;
+  transform: rotateX(180deg);
+}
+
+.envSeal {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  z-index: 5;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f08ea4, var(--color-letter-rose-deep));
+  box-shadow:
+    0 2px 6px rgba(120, 30, 50, 0.35),
+    inset 0 -2px 4px rgba(90, 10, 30, 0.25);
+  color: #fff4f6;
+  translate: -50% -50%;
+  transition:
+    opacity 250ms ease,
+    scale 250ms ease;
+}
+
+.sealHeart {
+  width: 22px;
+  height: 22px;
+}
+
+.envelope[data-stage="opening"] .envSeal {
+  opacity: 0;
+  scale: 0.6;
+}
+
+.envName {
+  position: absolute;
+  right: 0;
+  bottom: 9%;
+  left: 0;
+  z-index: 5;
+  color: #5a4836;
+  font-size: clamp(26px, 7vw, 34px);
+  text-align: center;
+}
+
+.hint {
+  color: var(--color-letter-muted);
+  font-size: 26px;
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+.sealed[data-stage="opening"] .hint {
+  opacity: 0;
+  animation: none;
+  transition: opacity 200ms ease;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+/* ---------- The letter ---------- */
+
+.letterWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  padding: 56px 14px 96px;
+  animation: fade-in 800ms ease both;
+}
+
+.paper {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  padding: clamp(36px, 7vw, 68px) clamp(22px, 6vw, 60px) clamp(30px, 6vw, 56px);
+  border-radius: 4px;
+  background: var(--color-letter-paper);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 20px 50px rgba(150, 70, 90, 0.16);
+  font-size: clamp(23px, 5.6vw, 29px);
+  line-height: 1.4;
+}
+
+/* A strip of washi tape holding the letter down. */
+.paper::before {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  width: 128px;
+  height: 30px;
+  background: rgba(240, 160, 182, 0.55);
+  content: "";
+  rotate: -3deg;
+  translate: -50% 0;
+}
+
+.greeting {
+  margin-bottom: 0.5em;
+  font-size: 1.3em;
+  font-weight: 400;
+}
+
+.greeting:focus {
+  outline: none;
+}
+
+.para {
+  margin-bottom: 0.9em;
+  text-wrap: pretty;
+}
+
+.closing {
+  margin-top: 1.4em;
+}
+
+.signature {
+  margin-top: 0.4em;
+  color: var(--color-letter-rose-deep);
+  font-size: 1.6em;
+  rotate: -4deg;
+  transform-origin: left;
+}
+
+.paper [data-reveal] {
+  opacity: 0;
+  translate: 0 16px;
+  transition:
+    opacity 900ms ease,
+    translate 900ms ease;
+}
+
+.paper [data-reveal][data-shown] {
+  opacity: 1;
+  translate: none;
+}
+
+/* ---------- Cut-out photos, like the ones glued into the card ---------- */
+
+.photo {
+  width: min(76%, 340px);
+  margin-block: 0.5em 1.4em;
+  filter: drop-shadow(0 10px 16px rgba(90, 40, 55, 0.24));
+  rotate: var(--tilt);
+}
+
+.photoLeft {
+  margin-inline: 4% auto;
+}
+
+.photoRight {
+  margin-inline: auto 4%;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.blobA img {
+  border-radius: 58% 42% 46% 54% / 44% 50% 50% 56%;
+}
+
+.blobB img {
+  border-radius: 42% 58% 52% 48% / 54% 42% 58% 46%;
+}
+
+.blobC img {
+  border-radius: 48% 52% 40% 60% / 42% 58% 44% 56%;
+}
+
+/* ---------- The question ---------- */
+
+.ask {
+  width: 100%;
+  max-width: 640px;
+  padding: 8px 12px 24px;
+  text-align: center;
+}
+
+.question {
+  margin-bottom: 20px;
+  font-size: clamp(32px, 8vw, 46px);
+  font-weight: 400;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.choices {
+  display: flex;
+  min-height: 160px;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+}
+
+.yes,
+.no {
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  white-space: nowrap;
+}
+
+.yes {
+  position: relative;
+  z-index: 2;
+  padding: 8px 38px 10px;
+  border: 0;
+  background: var(--color-letter-rose);
+  box-shadow: 0 10px 22px rgba(228, 99, 127, 0.4);
+  color: #fff;
+  font-size: 32px;
+  scale: var(--grow, 1);
+  transition:
+    scale 300ms cubic-bezier(0.3, 1.5, 0.5, 1),
+    background-color 200ms ease;
+}
+
+.yes:hover {
+  background: var(--color-letter-rose-deep);
+}
+
+.no {
+  position: relative;
+  z-index: 1;
+  padding: 6px 24px 8px;
+  border: 2px solid rgba(51, 49, 58, 0.22);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--color-letter-ink);
+  font-size: 26px;
+  translate: var(--x, 0) var(--y, 0);
+  transition: translate 380ms cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.yes:focus-visible,
+.no:focus-visible,
+.again:focus-visible {
+  outline: 3px solid var(--color-letter-rose-deep);
+  outline-offset: 4px;
+}
+
+.yay {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  padding-block: 20px;
+  color: var(--color-letter-rose);
+}
+
+.yayHeart {
+  width: 34px;
+  height: 34px;
+  animation: beat 1.2s ease-in-out infinite;
+}
+
+.yayHeart:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.yayHeart:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+@keyframes beat {
+  0%,
+  100% {
+    scale: 1;
+  }
+  30% {
+    scale: 1.25;
+  }
+}
+
+/* ---------- Heart burst on "Yes" ---------- */
+
+.burst {
+  position: fixed;
+  top: var(--y);
+  left: var(--x);
+  z-index: 50;
+  pointer-events: none;
+}
+
+.burstHeart {
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2);
+  color: var(--c);
+  opacity: 0;
+  animation: pop 1500ms cubic-bezier(0.15, 0.7, 0.3, 1) var(--delay) forwards;
+}
+
+@keyframes pop {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.3) rotate(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rot));
+  }
+}
+
+/* ---------- The night I asked ---------- */
+
+.proposal {
+  display: flex;
+  width: 100%;
+  max-width: 640px;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  scroll-margin-top: 40px;
+  animation: fade-in 900ms ease both;
+}
+
+.polaroid {
+  width: min(86%, 380px);
+  padding: 14px 14px 16px;
+  background: #fff;
+  box-shadow: 0 20px 44px rgba(120, 50, 70, 0.26);
+  rotate: -2deg;
+}
+
+.polaroid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+}
+
+.polaroid figcaption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 12px;
+  line-height: 1.1;
+}
+
+.polaroidDate {
+  font-size: 34px;
+}
+
+.polaroidCaption {
+  color: var(--color-letter-muted);
+  font-size: 26px;
+}
+
+.again {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--color-letter-rose-deep);
+  cursor: pointer;
+  font: inherit;
+  font-size: 26px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* ---------- Reduced motion: everything is simply there ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .floaters {
+    display: none;
+  }
+
+  .envelope,
+  .hint,
+  .letterWrap,
+  .proposal,
+  .yayHeart {
+    animation: none;
+  }
+
+  .paper [data-reveal] {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+
+  .yes,
+  .no {
+    transition: none;
+  }
+}
